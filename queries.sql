@@ -34,3 +34,9 @@ where username = 'test_user_1' and password = 'pw123';
 call checking_credentials ('test_user_1', 'pw123');
 
 call configuring_player ('1', '1', '2', '3', '4');
+
+update fighter 
+set points =  points + 2
+where fighter.id  = '2';
+
+call configuring_player ('1', 'Rock', '5', '6', '7', '8', '200000');

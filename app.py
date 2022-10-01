@@ -97,9 +97,10 @@ def adjust_strength(multiplier):
 weak_opponent = adjust_strength(0.1)
 fair_opponent = adjust_strength(10)
 strong_opponent = adjust_strength(100)
-print(weak_opponent)
-print(fair_opponent)
-print(strong_opponent)
+
+# def fighter_damage(skill_id):
+
+
 
       
 
@@ -118,6 +119,7 @@ def choose_signup_login():
     except:
         print("in error")
 
+# for character config, player have to choose 4 skill
 def which_skill_choice():
     temp_skill_hold = []    
     try:
@@ -128,6 +130,8 @@ def which_skill_choice():
                 print(index, y)
     except ValueError:
         print('not a number')
+
+testing = which_skill_choice()
 
 
 
@@ -198,39 +202,39 @@ def choose_skill(the_id):
 
 # test run for sign up works
 
-# def test_run():
-#     print('Welcome to Text Battle Arena!!')
-#     answer = choose_signup_login()
-#     if(answer == '1'):
-#         ask_user = signing_up()
-#         the_id = create_account(ask_user)
-#         config_character = choose_skill(the_id)
-#         config_fighter(config_character)
-#         character_selection(the_id)
+def test_run():
+    print('Welcome to Text Battle Arena!!')
+    answer = choose_signup_login()
+    if(answer == '1'):
+        ask_user = signing_up()
+        the_id = create_account(ask_user)
+        config_character = choose_skill(the_id)
+        config_fighter(config_character)
+        character_selection(the_id)
         
-#         return config_character
-#     elif(answer == '2'):
-#         print('Account Sign In: ')
-#         client_id = sign_in()
-#         character_list = character_selection(client_id)
-#         while True:
-#             selected_fighter = int(input('select your fighter, use number '))
-#             if (selected_fighter < 1 or selected_fighter > len(character_list)):
-#                 print('try again')
-#             else:
-#                 print('Choose an opponent: ')
-#                 print('1. Weak opponent awards 1 point')
-#                 print('2. Fair opponent awards 2 points')
-#                 print('3. Strong opponent awards 4 points')
-#                 client_choice = print('what is your decision? ')
+        return config_character
+    elif(answer == '2'):
+        print('Account Sign In: ')
+        client_id = sign_in()
+        character_list = character_selection(client_id)
+        while True:
+            selected_fighter = int(input('select your fighter, use number '))
+            if (selected_fighter < 1 or selected_fighter > len(character_list)):
+                print('try again')
+            else:
+                print('Choose an opponent: ')
+                print('1. Weak opponent awards 1 point')
+                print('2. Fair opponent awards 2 points')
+                print('3. Strong opponent awards 4 points')
+                client_choice = print('what is your decision? ')
 
-#                 choices = mob_list()
-#                 print(choices)
-#                 choose_mob = input('Which opponent did you want to try?')
+                choices = mob_list()
+                print(choices)
+                choose_mob = input('Which opponent did you want to try?')
                 
 
 
-#         print('goodbye for now')
+        print('goodbye for now')
     
 # test_run()
 

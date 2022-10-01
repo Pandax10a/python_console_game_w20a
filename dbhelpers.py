@@ -27,3 +27,5 @@ def the_closer(cursor):
     conn=cursor.connection            
     cursor.close()
     conn.close()
+
+

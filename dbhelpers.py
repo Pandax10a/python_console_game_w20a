@@ -17,6 +17,10 @@ def cursor_result(cursor, the_procedure, list_of_args=[]):
     result = cursor.fetchall()
     return result
 
+def cursor_no_result(cursor, the_procedure, list_of_args=[]):
+    cursor.execute(the_procedure, list_of_args)
+    
+
 
 
 def the_closer(cursor):

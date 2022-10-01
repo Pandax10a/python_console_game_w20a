@@ -1,3 +1,4 @@
+from ast import Num
 import mariadb
 import dbhelpers as dh
 
@@ -100,14 +101,42 @@ strong_opponent = adjust_strength(100)
 
 # def fighter_damage(skill_id):
 
+# i split the choose an opponent part into 2 functions
+def choose_opponent(choice):
+    # choice = input('choose an opponent: (1,2,3) ')
+    while True:
+        match choice:
+            case 1:
+                return weak_opponent
+            case 2:
+                return fair_opponent
+            case 3:
+                return strong_opponent
+            case _:
+                print('try again')
 
+def ask_choice():
+    print('Choose an opponent: ')
+    print('1. Weak opponent awards 1 point')
+    print('2. Fair opponent awards 2 points')
+    print('3. Strong opponent awards 4 points')
+       
+    while True:
+        try:
+            client_choice = int(input('what is your decision? ')) 
+            if(client_choice == 1 or client_choice == 2 or client_choice == 3):
+                return client_choice
+            else:
+                print('choose again with a number with 1, 2 or 3 ')
+        except ValueError:
+            print('that is not a number')
 
       
 
 def choose_signup_login():
     try:
         while True:
-            answer_new_or_login = input('Would you like sign up for account or sign in?: type 1 for new account or 2 for sing in ')
+            answer_new_or_login = input('Would you like sign up for account or sign in?: type 1 for new account or 2 for sign in ')
             if (answer_new_or_login == '1'):
                 print(answer_new_or_login)
                 print('sign up it is')
@@ -131,7 +160,7 @@ def which_skill_choice():
     except ValueError:
         print('not a number')
 
-testing = which_skill_choice()
+# testing = which_skill_choice()
 
 
 
@@ -216,26 +245,45 @@ def test_run():
     elif(answer == '2'):
         print('Account Sign In: ')
         client_id = sign_in()
-        character_list = character_selection(client_id)
+        
         while True:
-            selected_fighter = int(input('select your fighter, use number '))
-            if (selected_fighter < 1 or selected_fighter > len(character_list)):
-                print('try again')
-            else:
-                print('Choose an opponent: ')
-                print('1. Weak opponent awards 1 point')
-                print('2. Fair opponent awards 2 points')
-                print('3. Strong opponent awards 4 points')
-                client_choice = print('what is your decision? ')
+            character_list = character_selection(client_id)
+            try:            
+                selected_fighter = input('select your fighter, use number or q for quit ')
+                if(selected_fighter == Num):
 
-                choices = mob_list()
-                print(choices)
-                choose_mob = input('Which opponent did you want to try?')
+                    if (int(selected_fighter) < 1 or int(selected_fighter) > len(character_list)):
+                        match selected_fighter:
+                            case len(selected_fighter):
+                                print(selected_fighter)
+                    else:
+                        print('choose a number within range')
+                   
+                elif(selected_fighter == 'q'):
+                    break
+                else:
+                    print('try again with the available options: ')
+                store_choice = ask_choice()
+                stored_opponent = choose_opponent(store_choice)
+
+                print(stored_opponent)
+            except ValueError:
+                print('try again with the either your list of fighter or q for quit')
+
                 
 
 
         print('goodbye for now')
+
+
+
+# bbb = ask_choice()
+# aaa = choose_opponent(bbb)
+# print(aaa)
+
     
-# test_run()
+
+    
+test_run()
 
 # create_new_or_use_old()

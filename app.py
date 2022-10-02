@@ -1,4 +1,4 @@
-from ast import Num
+
 import mariadb
 import dbhelpers as dh
 
@@ -42,25 +42,25 @@ def find_client_id(user, password):
 
 # calling stored procedure to create the account on database
 def create_account(the_info):
-    cursor = dh.just_connect()
-    dh.cursor_no_result(cursor, 'CALL create_account(?,?)', [the_info[0], the_info[1]])
-    the_id=dh.cursor_result(cursor, 'CALL checking_credentials(?,?)', [the_info[0], the_info[1]])
-    dh.the_closer(cursor)
+    
+    dh.run_statement('CALL create_account(?,?)', [the_info[0], the_info[1]])
+    the_id=dh.run_statement('CALL checking_credentials(?,?)', [the_info[0], the_info[1]])
+    
     print(the_id)
     return the_id
 
 # config figher
 def config_fighter(the_info):
-    cursor = dh.just_connect()
-    dh.cursor_no_result(cursor, 'CALL configuring_player(?,?,?,?,?,?,?)', 
+    
+    dh.run_statement('CALL configuring_player(?,?,?,?,?,?,?)', 
     [the_info[0], the_info[1], the_info[2], the_info[3], the_info[4], the_info[5], the_info[6],])
-    dh.the_closer(cursor)
+    
 
 #character list, for client id
 def character_selection(client_id):
-    cursor = dh.just_connect()
-    character_list = dh.cursor_result(cursor, 'CALL character_selection_list(?)', [client_id[0][0]])
-    dh.the_closer(cursor)
+    
+    character_list = dh.run_statement('CALL character_selection_list(?)', [client_id[0][0]])
+    
     for x in character_list:
         print(x[0], x[1].decode("UTF-8"), "hp:", x[2], "points: ", x[3])
     return character_list
@@ -75,9 +75,9 @@ def sign_in():
 
 #mob list
 def mob_list():
-    cursor = dh.just_connect()
-    mob_list = dh.cursor_result(cursor, 'CALL mob_list')
-    dh.the_closer(cursor)
+    
+    mob_list = dh.run_statement('CALL mob_list')
+    
     return mob_list
 
 generic_mob = mob_list()
@@ -161,6 +161,8 @@ def which_skill_choice():
         print('not a number')
 
 # testing = which_skill_choice()
+
+
 
 
 
@@ -250,7 +252,10 @@ def test_run():
             character_list = character_selection(client_id)
             try:            
                 selected_fighter = input('select your fighter, use number or q for quit ')
-                if(selected_fighter == Num):
+                if(selected_fighter == None  and selected_fighter == 'q'):
+                    break
+                elif(selected_fighter != num):
+
 
                     if (int(selected_fighter) < 1 or int(selected_fighter) > len(character_list)):
                         match selected_fighter:

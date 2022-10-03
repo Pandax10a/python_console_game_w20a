@@ -84,24 +84,33 @@ def mob_list():
     
     return mob_list
 
-generic_mob = mob_list()
+def random_move():
+    import random
+    four_move = [3,4,5,6]
+    return random.choice(four_move)
+    
 
+
+generic_mob = mob_list()
 
 import math
 # this is to adjust hp, or the strength of the opponent
 def adjust_strength(multiplier):
-    multiplier_num = [multiplier]
+    multiplier_hp = [multiplier]
+
     basic_mob = []
     basic_mob.append(generic_mob[0][0])
     basic_mob.append(generic_mob[0][1].decode("UTF-8"))
-    multiplier_num.append(generic_mob[0][2])
-    basic_mob.extend([math.prod(multiplier_num), generic_mob[0][3], generic_mob[0][4], generic_mob[0][5], generic_mob[0][6]])
+    multiplier_hp.append(generic_mob[0][2])
+  
+
+    basic_mob.extend([math.prod(multiplier_hp), generic_mob[0][3], generic_mob[0][4], generic_mob[0][5], generic_mob[0][6]])
     return basic_mob
 
 
 weak_opponent = adjust_strength(0.1)
-fair_opponent = adjust_strength(10)
-strong_opponent = adjust_strength(100)
+fair_opponent = adjust_strength(100)
+strong_opponent = adjust_strength(1000)
 
 #convert move id to move name and damage
 def convert_id_move(move_id):
@@ -114,7 +123,12 @@ def rolling_for_damage(low, high):
     the_damage = random.randrange(low, high)
     return the_damage
 
+#with client id and fighter id, loads info of that fighter
+def current_fighter(client_id, fighter_id):
+    character_list = character_selection(client_id)
+    current_fighter = character_list[int(fighter_id)-1]
 
+    return current_fighter
 
 # i split the choose an opponent part into 2 functions
 def choose_opponent(choice):
@@ -267,6 +281,43 @@ def choose_skill(the_id):
 #     print(answer_to_new_old)
 
 # test run for sign up works
+def attack_available(current_fighter):
+    four_attacks = []
+    attack_1=convert_id_move(current_fighter[4])
+    attack_2=convert_id_move(current_fighter[5])
+    attack_3=convert_id_move(current_fighter[6])
+    attack_4=convert_id_move(current_fighter[7])
+    four_attacks.extend([attack_1, attack_2, attack_3, attack_4])
+
+    print(attack_1[0][1], " second test")
+       
+    print('fighter id: ', current_fighter[0])
+    print('name : ', current_fighter[1].decode("UTF-8"))
+    print('max hp : ', current_fighter[2])
+    print('points : ', current_fighter[3])
+    print("attack 1: name: ", attack_1[0][0].decode("UTF-8"), "|| min damage: ", attack_1[0][1], "|| max damage: ", attack_1[0][2])
+    print("attack 2: name: ", attack_2[0][0].decode("UTF-8"), "|| min damage: ", attack_1[0][1], "|| max damage: ", attack_1[0][2])
+    print("attack 3: name: ", attack_3[0][0].decode("UTF-8"), "|| min damage: ", attack_1[0][1], "|| max damage: ", attack_1[0][2])
+    print("attack 4: name: ", attack_4[0][0].decode("UTF-8"), "|| min damage: ", attack_1[0][1], "|| max damage: ", attack_1[0][2])
+    return four_attacks
+
+def combat_phase(figher_min, fighter_max, opp_min, opp_max):
+    temp_hp_tracker = []
+    fighter=rolling_for_damage(figher_min, fighter_max)
+    opponent=rolling_for_damage(opp_min, opp_max)
+
+def enemy_move(training_answer):
+    cpu_damage_container = []
+    cpu_number = random_move()
+    if (training_answer == 3):
+        convert_id_move(cpu_number)
+        cpu_damage_container.append(strong_opponent)
+        return cpu_damage_container
+
+testing_2 = enemy_move(3)
+print(testing_2)
+
+
 
 def test_run():
     print('Welcome to Text Battle Arena!!')
@@ -289,10 +340,39 @@ def test_run():
                 config_fighter(fighter_storage)
                 break
             else:
-                current_fighter = []
-                choose_fighter = input("choose your figher by number")
-                
-            
+                while True:
+                    try:   
+                        choose_fighter = int(input("choose your fighter by number: "))
+                        fighter_used = current_fighter(client_id, int(choose_fighter) - 1)
+                        attack_available(fighter_used)
+                        print("what would you like to train on to earn points? ")
+                        print("1. weak opponent, worth 1 point")
+                        print("2. fair opponent, worth 2 point")
+                        print("3. strong opponent, worth 4 point")
+                        training_answer = input('well?: ')
+                        temp_opponent = []
+                        match training_answer:
+                            case '1':
+                                temp_opponent = weak_opponent
+                            case '2':
+                                temp_opponent = fair_opponent
+                            case '3':
+                                temp_opponent = strong_opponent
+                            case default:
+                                print("try again")
+                        print(temp_opponent[1], "hp: ", temp_opponent[2])
+                        print("attack the opponent with attack 1 to 4")
+                        print(random_move())
+                        temp_hp_tracker = []
+                       
+                    except ValueError:
+                        print("choose a number")
+
+# aa = test_run()
+
+
+
+
 
         # else:
 
@@ -326,7 +406,7 @@ def test_run():
                 
 
 
-        print('goodbye for now')
+        # print('goodbye for now')
 
 
 

@@ -30,10 +30,10 @@ def signing_up():
 
 
 # use this for log in, will return tuple inside an array
-def find_client_id(user, password):
-    cursor = dh.just_connect()
-    result = dh.cursor_result(cursor, 'CALL checking_credentials(?,?)', [user, password])
-    dh.the_closer(cursor)
+def find_client_id(user_info=[]):
+    
+    result = dh.run_statement('CALL checking_credentials(?,?)', [user_info[0], user_info[1]])
+    
     return result
 
 
@@ -60,17 +60,21 @@ def config_fighter(the_info):
 def character_selection(client_id):
     
     character_list = dh.run_statement('CALL character_selection_list(?)', [client_id[0][0]])
-    
-    for x in character_list:
-        print(x[0], x[1].decode("UTF-8"), "hp:", x[2], "points: ", x[3])
-    return character_list
+    if(len(character_list) < 1):
+        print('You have no fighter created yet ')
+    else:
+        for x in character_list:
+            print(x[0], x[1].decode("UTF-8"), "hp:", x[2], "points: ", x[3])
+        return character_list
 
 #signing in
 def sign_in():
+    temp_info = []
     user = input('enter your username: ')
     password = input('enter your password: ')
-    the_id = find_client_id(user, password)
-    print(user, password)
+    temp_info.extend([user, password])
+    the_id = find_client_id(temp_info)
+    print(temp_info)
     return the_id
 
 #mob list
@@ -99,7 +103,18 @@ weak_opponent = adjust_strength(0.1)
 fair_opponent = adjust_strength(10)
 strong_opponent = adjust_strength(100)
 
-# def fighter_damage(skill_id):
+#convert move id to move name and damage
+def convert_id_move(move_id):
+    name_attack = dh.run_statement('CALL convert_id_move(?)', [move_id])
+    return name_attack
+
+# function to roll a number within 2 numbers range
+def rolling_for_damage(low, high):
+    import random
+    the_damage = random.randrange(low, high)
+    return the_damage
+
+
 
 # i split the choose an opponent part into 2 functions
 def choose_opponent(choice):
@@ -167,28 +182,48 @@ def which_skill_choice():
 
 
 def create_new_or_use_old():
-    fighter_container = []
-    try:
-        while True:
-            answer_new_old_char = input('Would you like to create a new fighter or continue from previous? 1 for new, 2 for continue ')
-            if(answer_new_old_char == '1'):
-                fighter_name = input('enter a name for your fighter: ')
-                print(fighter_name, " is this correct?")
-                for x in skill_list:
-                    print (x[0], " ", x[1].decode("UTF-8")," min: ", x[2]," max: ", x[3])
-
-                skill_1 = input('pick your skill 1 using the number: ')
-                skill_2 = input('pick your skill 2 using the number: ')
-                skill_3 = input('pick your skill 3 using the number: ')
-                skill_4 = input('pick your skill 4 using the number: ')
-                fighter_container.extend([skill_1, skill_2, skill_3, skill_4])
-                print(fighter_container)
+    answer = input('Create new?: type 1 or Continue to selection screen: type 2')
+    match answer:
+        case 0:
+            return 0
+        case 1:
+            return 1
+        case 'new':
+            return 0
+        case 'continue':
+            return 1
+        case default:
+            return 0
+ 
+    #         answer_new_old_char = input('Would you like to create a new fighter or continue from previous? 1 for new, 2 for continue ')
+    #         if(answer_new_old_char == '1'):
+    #             fighter_container = create_fighter()
+    #             return fighter_container
                     
 
-            elif(answer_new_old_char == '2'):
-                print(answer_new_old_char)
-    except:
-        print('the error 2')
+    #         elif(answer_new_old_char == '2'):
+    #             print(answer_new_old_char)
+    # except:
+    #     print('the error 2')
+
+def create_fighter(answer):
+    if (answer == '1'):
+        fighter_container = []
+        fighter_name = input('enter a name for your fighter: ')
+        print(fighter_name, " is this correct?")
+        for x in skill_list:
+            print (x[0], " ", x[1].decode("UTF-8")," min: ", x[2]," max: ", x[3])
+
+        skill_1 = input('pick your skill 1 using the number: ')
+        skill_2 = input('pick your skill 2 using the number: ')
+        skill_3 = input('pick your skill 3 using the number: ')
+        skill_4 = input('pick your skill 4 using the number: ')
+        fighter_container.extend([skill_1, skill_2, skill_3, skill_4])
+        print(fighter_container)
+        return fighter_container
+    else:
+        create_new_or_use_old()
+
 
 
 # created a set of value in function that is needed to satisfy stored procedure configuring_player
@@ -247,33 +282,46 @@ def test_run():
     elif(answer == '2'):
         print('Account Sign In: ')
         client_id = sign_in()
-        
+        character_list = character_selection(client_id)
         while True:
-            character_list = character_selection(client_id)
-            try:            
-                selected_fighter = input('select your fighter, use number or q for quit ')
-                if(selected_fighter == None  and selected_fighter == 'q'):
-                    break
-                elif(selected_fighter != num):
+            if(len(character_list) < 1):
+                fighter_storage = create_fighter(client_id)
+                config_fighter(fighter_storage)
+                break
+            else:
+                current_fighter = []
+                choose_fighter = input("choose your figher by number")
+                
+            
+
+        # else:
+
+        # while True:
+            
+        #     try:            
+        #         selected_fighter = input('select your fighter, use number or q for quit ')
+        #         if(selected_fighter == None  and selected_fighter == 'q'):
+        #             break
+        #         elif(selected_fighter != num):
 
 
-                    if (int(selected_fighter) < 1 or int(selected_fighter) > len(character_list)):
-                        match selected_fighter:
-                            case len(selected_fighter):
-                                print(selected_fighter)
-                    else:
-                        print('choose a number within range')
+        #             if (int(selected_fighter) < 1 or int(selected_fighter) > len(character_list)):
+        #                 match selected_fighter:
+        #                     case len(selected_fighter):
+        #                         print(selected_fighter)
+        #             else:
+        #                 print('choose a number within range')
                    
-                elif(selected_fighter == 'q'):
-                    break
-                else:
-                    print('try again with the available options: ')
-                store_choice = ask_choice()
-                stored_opponent = choose_opponent(store_choice)
+        #         elif(selected_fighter == 'q'):
+        #             break
+        #         else:
+        #             print('try again with the available options: ')
+        #         store_choice = ask_choice()
+        #         stored_opponent = choose_opponent(store_choice)
 
-                print(stored_opponent)
-            except ValueError:
-                print('try again with the either your list of fighter or q for quit')
+        #         print(stored_opponent)
+        #     except ValueError:
+        #         print('try again with the either your list of fighter or q for quit')
 
                 
 
@@ -289,6 +337,6 @@ def test_run():
     
 
     
-test_run()
+# test_run()
 
 # create_new_or_use_old()

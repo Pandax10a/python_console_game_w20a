@@ -130,12 +130,14 @@ def current_fighter(client_id, fighter_id):
 
     return current_fighter
 
-def update_points(fighter_id, points):
-    dh.run_statement("CALL kill_count(?, ?)", [fighter_id, points])
-    return loot
-loot = [1, 1]
-test_add_1 = update_points(1, 3)
-print(test_add_1)
+def update_points(difficulty, fighter_id):
+    if(difficulty == 1):
+        dh.run_statement("CALL kill_count(?, ?)", [fighter_id, 1])
+    elif(difficulty == 2):
+        dh.run_statement("CALL kill_count(?, ?)", [fighter_id, 2])
+    elif(difficulty == 3):
+        dh.run_statement("CALL kill_count(?, ?)", [fighter_id, 4])
+
 # i split the choose an opponent part into 2 functions
 def choose_opponent(choice):
     # choice = input('choose an opponent: (1,2,3) ')
@@ -307,10 +309,16 @@ def attack_available(current_fighter):
     print("attack 4: name: ", attack_4[0][0].decode("UTF-8"), "|| min damage: ", attack_1[0][1], "|| max damage: ", attack_1[0][2])
     return four_attacks
 
-def combat_phase(figher_damage, enemy_damage):
+def combat_phase(figher_move, enemy_move, fighter_used, temp_opponent):
     temp_hp_tracker = []
-    fighter=rolling_for_damage(figher_min, fighter_max)
-    opponent=rolling_for_damage(opp_min, opp_max)
+    temp_hp_tracker.append(fighter_used[2])
+    temp_hp_tracker.append(temp_opponent[2])
+    while (temp_hp_tracker[0] > 0 and temp_hp_tracker[1] > 0):
+    
+    enemy_damage = enemy_move
+    fighter_damage = figher_move
+    damage_result_fighter = 
+    return temp_hp_tracker
 
 def enemy_move(training_answer):
     cpu_damage_container = []
@@ -376,10 +384,12 @@ def test_run():
                         temp_hp_tracker.append(fighter_used[2])
                         temp_hp_tracker.append(temp_opponent[2])
                         print(temp_hp_tracker)
-                        while (temp_hp_tracker[0] > 0 or temp_hp_tracker[1] > 0):
+                        while (temp_hp_tracker[0] > 0 and temp_hp_tracker[1] > 0):
                             choose_attack = input("enter 1 to 4 to attack: ")
                             if(temp_hp_tracker[1] <= 0):
-                                print(choose_attack)
+                                update_points(training_answer, choose_fighter)
+                                break
+
                     except ValueError:
                         print("choose a number")
 

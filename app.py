@@ -4,9 +4,9 @@ import dbhelpers as dh
 
 
 def check_skill_list():
-    cursor = dh.just_connect()
-    the_skill_list = dh.cursor_result(cursor, "CALL skill_selection_list")
-    dh.the_closer(cursor)
+   
+    the_skill_list = dh.run_statement("CALL skill_selection_list")
+   
     return the_skill_list
 
 skill_list = check_skill_list()
@@ -86,7 +86,7 @@ def mob_list():
 
 def random_move():
     import random
-    four_move = [3,4,5,6]
+    four_move = [13,14,15,16]
     return random.choice(four_move)
     
 
@@ -130,6 +130,12 @@ def current_fighter(client_id, fighter_id):
 
     return current_fighter
 
+def update_points(fighter_id, points):
+    dh.run_statement("CALL kill_count(?, ?)", [fighter_id, points])
+    return loot
+loot = [1, 1]
+test_add_1 = update_points(1, 3)
+print(test_add_1)
 # i split the choose an opponent part into 2 functions
 def choose_opponent(choice):
     # choice = input('choose an opponent: (1,2,3) ')
@@ -301,7 +307,7 @@ def attack_available(current_fighter):
     print("attack 4: name: ", attack_4[0][0].decode("UTF-8"), "|| min damage: ", attack_1[0][1], "|| max damage: ", attack_1[0][2])
     return four_attacks
 
-def combat_phase(figher_min, fighter_max, opp_min, opp_max):
+def combat_phase(figher_damage, enemy_damage):
     temp_hp_tracker = []
     fighter=rolling_for_damage(figher_min, fighter_max)
     opponent=rolling_for_damage(opp_min, opp_max)
@@ -310,12 +316,15 @@ def enemy_move(training_answer):
     cpu_damage_container = []
     cpu_number = random_move()
     if (training_answer == 3):
-        convert_id_move(cpu_number)
-        cpu_damage_container.append(strong_opponent)
-        return cpu_damage_container
+        current_move = convert_id_move(cpu_number)
+        cpu_damage_container.extend([current_move[0][1]*1000, current_move[0][2]*1000])
+        print(current_move[0][0].decode("UTF-8"), "damage range: ", cpu_damage_container)
+        the_damage = rolling_for_damage(cpu_damage_container[0], cpu_damage_container[1])
+        print("using ", current_move[0][0].decode("UTF-8"), " it did ", the_damage, " damages to YOU!!!") 
+        return the_damage
 
-testing_2 = enemy_move(3)
-print(testing_2)
+# testing_2 = enemy_move(3)
+# print(testing_2)
 
 
 
@@ -364,7 +373,13 @@ def test_run():
                         print("attack the opponent with attack 1 to 4")
                         print(random_move())
                         temp_hp_tracker = []
-                       
+                        temp_hp_tracker.append(fighter_used[2])
+                        temp_hp_tracker.append(temp_opponent[2])
+                        print(temp_hp_tracker)
+                        while (temp_hp_tracker[0] > 0 or temp_hp_tracker[1] > 0):
+                            choose_attack = input("enter 1 to 4 to attack: ")
+                            if(temp_hp_tracker[1] <= 0):
+                                print(choose_attack)
                     except ValueError:
                         print("choose a number")
 

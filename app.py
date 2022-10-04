@@ -309,17 +309,52 @@ def attack_available(current_fighter):
     print("attack 4: name: ", attack_4[0][0].decode("UTF-8"), "|| min damage: ", attack_1[0][1], "|| max damage: ", attack_1[0][2])
     return four_attacks
 
-def combat_phase(figher_move, enemy_move, fighter_used, temp_opponent):
-    temp_hp_tracker = []
-    temp_hp_tracker.append(fighter_used[2])
-    temp_hp_tracker.append(temp_opponent[2])
-    while (temp_hp_tracker[0] > 0 and temp_hp_tracker[1] > 0):
-    
-    enemy_damage = enemy_move
-    fighter_damage = figher_move
-    damage_result_fighter = 
-    return temp_hp_tracker
 
+
+
+#takes in fighter id, gives the 4 attack selection, uses low and high damage range for the roll and returns the roll   
+def fighter_move(fighter_used):
+    fighter_damage_container = []
+    
+    character_info = dh.run_statement("CALL character_selection_list(?)", [fighter_used])
+    attack_1 = skill_list[character_info[0][4]-1]
+    attack_2 = skill_list[character_info[0][5]-1]
+    attack_3 = skill_list[character_info[0][6]-1]
+    attack_4 = skill_list[character_info[0][7]-1]    
+    
+
+    answer_answer = input("which attack would u like to use?: 1 to 4:   ")
+    match answer_answer:
+        case '1':
+            fighter_damage_container.extend([attack_1[2], attack_1[3]])
+            print(fighter_damage_container)
+            print('using ', attack_1[1].decode("UTF-8"))
+            
+        case '2':
+            fighter_damage_container.extend([attack_2[2], attack_2[3]])
+            print(fighter_damage_container)
+            print('using ', attack_2[1].decode("UTF-8"))
+        case '3':
+            fighter_damage_container.extend([attack_3[2], attack_3[3]])
+            print(fighter_damage_container)
+            print('using ', attack_3[1].decode("UTF-8"))
+        case '4':
+            fighter_damage_container.extend([attack_4[2], attack_4[3]])
+            print(fighter_damage_container)
+            print('using ', attack_4[1].decode("UTF-8"))
+        case _:
+            print("this attack not available ")
+    fighter_damage = rolling_for_damage(fighter_damage_container[0], fighter_damage_container[1])
+    print('YOU did ', fighter_damage, " damage to the enemy!!!")
+    
+    return fighter_damage
+
+
+        
+
+
+# adjusted damage modifier for weak,fair,strong opponent here, the other function adjusted hp
+# in addition this randomized the opponents move and returns the finalized damage
 def enemy_move(training_answer):
     cpu_damage_container = []
     cpu_number = random_move()
@@ -328,12 +363,57 @@ def enemy_move(training_answer):
         cpu_damage_container.extend([current_move[0][1]*1000, current_move[0][2]*1000])
         print(current_move[0][0].decode("UTF-8"), "damage range: ", cpu_damage_container)
         the_damage = rolling_for_damage(cpu_damage_container[0], cpu_damage_container[1])
-        print("using ", current_move[0][0].decode("UTF-8"), " it did ", the_damage, " damages to YOU!!!") 
+        # print("using ", current_move[0][0].decode("UTF-8"), " it did ", the_damage, " damages to YOU!!!") 
+        return the_damage
+    elif (training_answer == 2):
+        current_move = convert_id_move(cpu_number)
+        cpu_damage_container.extend([current_move[0][1], current_move[0][2]])
+        print(current_move[0][0].decode("UTF-8"), "damage range: ", cpu_damage_container)
+        the_damage = rolling_for_damage(cpu_damage_container[0], cpu_damage_container[1])
+        # print("using ", current_move[0][0].decode("UTF-8"), " it did ", the_damage, " damages to YOU!!!") 
+        return the_damage
+    elif (training_answer == 1):
+        current_move = convert_id_move(cpu_number)
+        cpu_damage_container.extend([current_move[0][1]*0.5, current_move[0][2]*0.5])
+        print(current_move[0][0].decode("UTF-8"), "damage range: ", cpu_damage_container)
+        the_damage = rolling_for_damage(cpu_damage_container[0], cpu_damage_container[1])
+        # print("using ", current_move[0][0].decode("UTF-8"), " it did ", the_damage, " damages to YOU!!!") 
         return the_damage
 
+def combat_phase(figher_move, enemy_move, fighter_used, training_answer, my_hp, enemy_hp):
+    while True:
+        
+        temp_hp_tracker = []
+        temp_hp_tracker.append(int(my_hp[2]))
+        temp_hp_tracker.append(int(enemy_hp[1]))
+        print("your hp: ", temp_hp_tracker[0], "enemy hp: ", temp_hp_tracker[1])
+        if(int(temp_hp_tracker[0]) >0 and int(temp_hp_tracker[1])>0):
+            my_damage = figher_move(fighter_used)
+            print('YOU did ', my_damage, " of damages!!!")
+            enemy_damage = enemy_move(training_answer)
+            print("enemy hit YOU for ", "testing", " damages!!")
+        elif (int(temp_hp_tracker[0]) <0 or int(temp_hp_tracker[1])<0):  
+            break
+        
+        enemy_hp = temp_hp_tracker.pop()
+        fighter_hp = temp_hp_tracker.pop()
+        fighter_result = fighter_hp - enemy_damage
+        temp_hp_tracker.append(fighter_result)
+        enemy_result = enemy_hp - my_damage
+        temp_hp_tracker.append(enemy_result)
+        if (temp_hp_tracker[0] <=0 or temp_hp_tracker[1] <= 0):
+            break
 # testing_2 = enemy_move(3)
 # print(testing_2)
+# aaa = ['333', '5555', '3333']
+# dam_1 = fighter_move(1)
+# dam_2 = enemy_move(2)
+# a = 1
+# b = 1
 
+# testing_damage = combat_phase(dam_1, dam_2, '1', '3',  aaa, aaa)
+
+# print(testing_damage)
 
 
 def test_run():
@@ -384,16 +464,17 @@ def test_run():
                         temp_hp_tracker.append(fighter_used[2])
                         temp_hp_tracker.append(temp_opponent[2])
                         print(temp_hp_tracker)
-                        while (temp_hp_tracker[0] > 0 and temp_hp_tracker[1] > 0):
-                            choose_attack = input("enter 1 to 4 to attack: ")
-                            if(temp_hp_tracker[1] <= 0):
-                                update_points(training_answer, choose_fighter)
-                                break
+                        combat_phase(fighter_move(fighter_used), enemy_move(training_answer), fighter_used, training_answer, fighter_used[2], temp_opponent[2])
+                        # while (temp_hp_tracker[0] > 0 and temp_hp_tracker[1] > 0):
+                        #     choose_attack = input("enter 1 to 4 to attack: ")
+                        #     if(temp_hp_tracker[1] <= 0):
+                        #         update_points(training_answer, choose_fighter)
+                        #         break
 
                     except ValueError:
                         print("choose a number")
 
-# aa = test_run()
+aa = test_run()
 
 
 
